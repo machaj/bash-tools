@@ -38,6 +38,9 @@ colors::list() {
     white)
       echo 15
       ;;
+    silver)
+      echo 7
+      ;;
     *)
       isInteger='^[0-9]+$'
       if [[ $1 =~ $isInteger ]] ; then
