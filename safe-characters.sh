@@ -2,9 +2,9 @@
 
 # Script to replace "ugly" characters for safe ones
 
-# replace_unsafe_characters "${@}"
+# rename_to_simple_string find . -type f -not -regex '\.[.()a-zA-Z0-9\/_\-]*$'
 
-toReplace=(
+chars_to_replace=(
   'Á/A'
   'á/a'
   'É/E'
@@ -40,18 +40,38 @@ toReplace=(
   '\&/and'
   '’/'
   ':/'
+  '!/'
+  '=/-'
+  ',/'
 )
 
+create_sed_expression() {
+  local sed_expression='s/#//g'
 
-replace_unsafe_characters() {
-  local app=$1
-  shift
-
-  for regex in ${toReplace[*]}
-  do
-    $app "${@}" | rename "s/$regex/g"
+  for regex in ${chars_to_replace[*]}; do
+    new_string=$(echo "$new_string; s/$regex/g")
   done
 
-  $app "${@}" | rename 's/ /_/g'
+  echo $new_string
+}
+
+sed_expression=$(create_sed_expression)
+
+create_simple_string() {
+  local new_string=$(echo $1 | sed -e "$sed_expression")
+  new_string=$(echo $new_string | sed -e 's/ /_/g')
+
+  echo $new_string
+}
+
+rename_to_simple_string() {
+  local result_lines=$("$@")
+
+   for line in $result_lines; do
+     echo -E "$(colors::foreground blue from:) $line"
+     local new_name=$(create_simple_string $line)
+     echo -E "$(colors::foreground green '  to:') $new_name"
+     mv -i "$line" "$new_name"
+   done
 }
 
