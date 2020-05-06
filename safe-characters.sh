@@ -4,6 +4,8 @@
 
 # rename_to_simple_string find . -type f -not -regex '\.[.()a-zA-Z0-9\/_\-]*$'
 
+GIT_DIFF_HIGHLIGHT_PATH="/usr/share/doc/git/contrib/diff-highlight/diff-highlight"
+
 chars_to_replace=(
   'Á/A'
   'á/a'
@@ -43,6 +45,8 @@ chars_to_replace=(
   '!/'
   '=/-'
   ',/'
+  '(/'
+  ')/'
 )
 
 create_sed_expression() {
@@ -65,13 +69,23 @@ create_simple_string() {
 }
 
 rename_to_simple_string() {
-  local result_lines=$("$@")
-
-   for line in $result_lines; do
-     echo -E "$(colors::foreground blue from:) $line"
-     local new_name=$(create_simple_string $line)
-     echo -E "$(colors::foreground green '  to:') $new_name"
-     mv -i "$line" "$new_name"
-   done
+  # Change Input Field Separator to new line, instead of space
+  IFS=$'\n';
+  for line in $("$@"); do
+    local new_name=$(create_simple_string $line)
+    if [ "$line" = "$new_name" ]; then
+      echo -E "$(colors::foreground violet 'ignore:') $line"
+    else
+      echo -E "$(colors::foreground blue from:) $line"
+      if [ -f "$GIT_DIFF_HIGHLIGHT_PATH" ]; then
+        local name_diff=$(diff -u <(echo "$line") <(echo "$new_name") | $GIT_DIFF_HIGHLIGHT_PATH | tail -1)
+        echo -E "$(colors::foreground green '  to:') ${name_diff:1}"
+      else
+        echo -E "$(colors::foreground red 'Missing diff-highlight check GIT_DIFF_HIGHLIGHT_PATH") ')"
+        echo -E "$(colors::foreground green '  to:') $new_name"
+      fi
+      mv -i "$line" "$new_name"
+    fi
+  done
 }
 
