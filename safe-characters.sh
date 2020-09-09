@@ -47,6 +47,9 @@ chars_to_replace=(
   ',/'
   '(/'
   ')/'
+  '"/'
+  '\[/'
+  '\]/'
 )
 
 create_sed_expression() {

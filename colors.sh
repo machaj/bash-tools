@@ -3,7 +3,7 @@
 # Colors a text background and foreground
 # colors::background orange $(colors::foreground red This is a sample text)
 
-colors::list() {
+colors_list() {
   case "$1" in
     blue)
       echo 27 # 27 26 111 117 153
@@ -53,23 +53,23 @@ colors::list() {
 }
 
 colors::foreground() {
-  local color=$(colors::list $1)
+  local color=$(colors_list $1)
   shift
   echo -en "\033[38;5;${color}m\033[1m${@}\033[0m"
 }
 
 colors::background() {
-  local color=$(colors::list $1)
+  local color=$(colors_list $1)
   shift
   echo -en "\033[48;5;${color}m\033[1m${@}\033[0m"
 }
 
 colors::ps1_fg() {
-  echo -en "\001\033[38;5;$(colors::list $1)m\033[1m\002"
+  echo -en "\001\033[38;5;$(colors_list $1)m\033[1m\002"
 }
 
 colors::ps1_bg() {
-  echo -en "\001\033[48;5;$(colors::list $1)m\033[1m\002"
+  echo -en "\001\033[48;5;$(colors_list $1)m\033[1m\002"
 }
 
 colors::ps1_reset() {

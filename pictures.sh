@@ -1,4 +1,11 @@
 #!/bin/bash
+source $BASH_TOOLS_HOME/validate-rule.sh
+
+pictures_validate_year() {
+  common_validate
+  validate_rule "Valid file extenstions are jpg" find . -type f -not -iname '*.jpg'
+  validate_rule "Folder name should contains only 0-9" find . -type d -not -regex '\.\/?[0-9]?[0-9]?\/?[0-9]?[0-9]?$'
+}
 
 get_exif_create_date_cs_CZ() {
   if create_date_time="$(exif --tag=DateTimeOriginal --no-fixup --machine-readable $1 2>/dev/null)"; then
@@ -35,4 +42,12 @@ sort_out_images() {
   do
     move_image_to_year_month_day_folder $file
   done
+}
+
+list_sorted_image_names() {
+  if [ -z "$1" ]; then
+    echo "Need output file!"
+  else
+    find . -type f -printf "%f %h\n" | sort > ~/$1
+  fi
 }
