@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run In the Backgrount
+# It runs a command in background and redirect error output to /dev/null
 rib() {
   local app=$1
   shift
