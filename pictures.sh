@@ -3,7 +3,7 @@ source $BASH_TOOLS_HOME/validate-rule.sh
 
 pictures_validate_year() {
   common_validate
-  validate_rule "Valid file extenstions are jpg" find . -type f -not -iname '*.jpg'
+  validate_rule "Valid file extenstions are jpg & cr2" find . -type f -not \( -iname '*.jpg' -o -iname '*.cr2' \)
   validate_rule "Folder name should contains only 0-9" find . -type d -not -regex '\.\/?[0-9]?[0-9]?\/?[0-9]?[0-9]?$'
 }
 
