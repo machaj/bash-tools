@@ -7,10 +7,15 @@ pictures_validate_year() {
   validate_rule "Folder name should contains only 0-9" find . -type d -not -regex '\.\/?[0-9]?[0-9]?\/?[0-9]?[0-9]?$'
 }
 
+# For HEIC support it needs image magick 7+
 get_exif_create_date_cs_CZ() {
-  if create_date_time="$(exif --tag=DateTimeOriginal --no-fixup --machine-readable $1 2>/dev/null)"; then
-    local create_date=$(echo $create_date_time | cut -d " " -f 1)
-    echo $create_date
+  if create_date_exif="$(identify -format '%[EXIF:DateTimeOriginal*]' $1 2>/dev/null)"; then
+    if [ -z "$create_date_exif" ]; then
+      echo 1
+    else
+      local create_date="$(echo $create_date_exif | cut -d "=" -f 2 | cut -d " " -f 1)"
+      echo $create_date
+    fi
   else
     echo 1
   fi
