@@ -1,5 +1,5 @@
 #!/bin/bash
 
 #Display command and run it
-par() { colors::foreground green "$@\n" ; "$@" ; }
+par() { colors::foreground yellow "$@\n" ; "$@" ; }
 

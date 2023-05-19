@@ -2,8 +2,13 @@
 source $BASH_TOOLS_HOME/validate-rule.sh
 
 pictures_validate_year() {
+  colors::foreground green "Run this inside photo year folder. E.g ~/Pictures/Photo/2023\n"
   common_validate
-  validate_rule "Valid file extenstions are jpg & cr2" find . -type f -not \( -iname '*.jpg' -o -iname '*.cr2' \)
+  validate_rule "Valid file extenstions are jpg, cr2, heic, aae" find . -type f -not \( \
+          -iname '*.jpg' \
+          -o -iname '*.cr2' \
+          -o -iname '*.heic' \
+          -o -iname '*.aae' \)
   validate_rule "Folder name should contains only 0-9" find . -type d -not -regex '\.\/?[0-9]?[0-9]?\/?[0-9]?[0-9]?$'
 }
 
@@ -29,16 +34,20 @@ create_year_month_day_folders() {
 }
 
 move_image_to_year_month_day_folder() {
-  local filename=$(basename -- $1)
-  local create_date=$(get_exif_create_date_cs_CZ $filename)
+  if [[ $1 == *.JPG ]] || [[ $1 == *.HEIC ]]; then
+    local filename=$(basename -- $1)
+    local create_date=$(get_exif_create_date_cs_CZ $filename)
 
-  if [ $create_date != 1 ]; then
-    local path=$(create_year_month_day_folders $create_date)
-    local name=${filename%.*}
-    mv $name.* $path/
-    colors::foreground green "$name.* TO $path\n"
+    if [ $create_date != 1 ]; then
+      local path=$(create_year_month_day_folders $create_date)
+      local name=${filename%.*}
+      mv $name.* $path/
+      colors::foreground green "$name.* TO $path\n"
+    else
+      echo "$filename ignored"
+    fi
   else
-    echo "$filename ignored"
+    echo "$1 incorrect file type"
   fi
 }
 
